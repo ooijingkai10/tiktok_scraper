@@ -1,0 +1,1 @@
+python3 "./scrapper.py" --cookie "<COOKIE>" --scrape 300 --output "scrape" --profile "https://www.tiktok.com/@lazada_sg?lang=en"

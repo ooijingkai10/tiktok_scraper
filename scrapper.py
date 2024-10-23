@@ -21,7 +21,7 @@ class TikTokScraper:
 
         # Setup the WebDriver
         self.chrome_options = webdriver.ChromeOptions()
-        # self.chrome_options.add_argument('--headless')
+        self.chrome_options.add_argument('--headless')
         self.driver = webdriver.Chrome(chrome_options=self.chrome_options)
 
     def convert(self):
@@ -36,18 +36,20 @@ class TikTokScraper:
 
     def scrape(self):
         print("Scraping data...")
-        for i in range(len(self.driver.requests) - 1, -1, -1):
-            print(i)
-            request = self.driver.requests[i]
-            if "https://www.tiktok.com/api/user/list/?WebIdLastTime" in request.url and request.response:
-                # print(f"URL: {request.url}")
-                # body = decode(request.response.body, request.response.headers.get('Content-Encoding', 'identity'))
-                # data = body.decode("utf8")
-                # response_json = json.loads(data)
-                # user_list = response_json.get('userList', [])
-                # self.user_list.extend(user_list)  # Add new users to the temporary list
-                # self.convert()  # Check if we need to write to a file
-                break
+        # Define the target URL
+        target_url = "https://www.tiktok.com/api/user/list/?WebIdLastTime"
+        # Loop through requests in reverse order
+        for request in reversed(self.driver.requests):
+            
+            if target_url in request.url and request.response:
+                print(f"Checking request: {request.url}")
+                body = decode(request.response.body, request.response.headers.get('Content-Encoding', 'identity'))
+                data = body.decode("utf8")
+                response_json = json.loads(data)
+                # Extend user list with new users
+                self.user_list.extend(response_json.get('userList', []))
+                self.convert()
+                break  # Exit after finding the first match
 
     def interceptor(self, request):
         # Add the missing headers
@@ -57,12 +59,10 @@ class TikTokScraper:
     def run(self):
         self.driver.request_interceptor = self.interceptor
         self.driver.get(self.profile)
-        time.sleep(5)
+        time.sleep(20)
         self.driver.find_element(By.XPATH, '/html/body/div[1]/div[2]/div[2]/div/div/div[1]/div[2]/div[3]/h3/div[2]/span').click()
-        time.sleep(10)
-
+        time.sleep(20)
         modal = self.driver.find_element(By.XPATH, '/html/body/div[9]/div/div[2]/div/div/div[2]/div/div/section/div/div[3]')
-
         while self.scrape_count:
             try:
                 # Scroll to load more data in the modal
@@ -73,14 +73,12 @@ class TikTokScraper:
             except Exception as e:
                 print(f"Error during scrolling: {e}")
                 break  # Break the loop if scrolling fails, but retain collected data
-
         # Write any remaining users to a final file after finishing
         if self.user_list:
             output_file = os.path.join(self.output_dir, f"follower_list_{self.file_counter}.json")
             with open(output_file, 'w') as outfile:
                 json.dump(self.user_list, outfile, indent=4)
             print(f"Data successfully written to {output_file}")
-
         self.driver.quit()
 
 if __name__ == "__main__":
@@ -96,3 +94,4 @@ if __name__ == "__main__":
     # Instantiate the scraper and run it
     scraper = TikTokScraper(cookie=args.cookie, scrape_count=args.scrape, output_dir=args.output_dir, profile=args.profile)
     scraper.run()
+    scraper.convert()  # Check if we need to write to a file
