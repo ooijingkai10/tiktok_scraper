@@ -7,7 +7,7 @@ pip install -r requirements.txt
 
 # Run the scraper
 ```
-usage: scrapper.py [-h] --cookie COOKIE --scrape SCRAPE --output OUTPUT
+usage: python3 scrapper.py [-h] --cookie COOKIE --scrape SCRAPE --output OUTPUT
                    --profile PROFILE
 
 TikTok scraper with Selenium.
