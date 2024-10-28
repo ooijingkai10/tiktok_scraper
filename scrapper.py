@@ -21,7 +21,7 @@ class TikTokScraper:
 
         # Setup the WebDriver
         self.chrome_options = webdriver.ChromeOptions()
-        self.chrome_options.add_argument('--headless')
+        # self.chrome_options.add_argument('--headless')
         self.driver = webdriver.Chrome(chrome_options=self.chrome_options)
 
     def convert(self):
@@ -61,8 +61,8 @@ class TikTokScraper:
         self.driver.get(self.profile)
         time.sleep(20)
         self.driver.find_element(By.XPATH, '/html/body/div[1]/div[2]/div[2]/div/div/div[1]/div[2]/div[3]/h3/div[2]/span').click()
-        time.sleep(20)
-        modal = self.driver.find_element(By.XPATH, '/html/body/div[9]/div/div[2]/div/div/div[2]/div/div/section/div/div[3]')
+        time.sleep(10)
+        modal = self.driver.find_element(By.XPATH, '/html/body/div[8]/div/div[2]/div/div/div[2]/div/div/section/div/div[3]')
         while self.scrape_count:
             try:
                 # Scroll to load more data in the modal

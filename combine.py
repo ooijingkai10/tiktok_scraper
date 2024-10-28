@@ -1,5 +1,6 @@
 import os
 import json
+import argparse
 
 def combine_json_files(input_folder, output_file):
     combined_data = []
@@ -17,9 +18,13 @@ def combine_json_files(input_folder, output_file):
     with open(output_file, 'w') as f:
         json.dump(combined_data, f, indent=4)
 
-# Set input folder and output file paths
-input_folder = './scraped'
-output_file = './scraped/combined.json'
+def main():
+    parser = argparse.ArgumentParser(description="Combine multiple JSON files in a folder into a single JSON file.")
+    parser.add_argument("-i", "--input_folder", required=True, help="Path to the input folder containing JSON files")
+    parser.add_argument("-o", "--output_file", required=True, help="Output filename for the combined JSON file")
+    args = parser.parse_args()
 
-# Combine the files
-combine_json_files(input_folder, output_file)
+    combine_json_files(args.input_folder, args.output_file)
+
+if __name__ == "__main__":
+    main()
